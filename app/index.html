@@ -1,0 +1,78 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<title>Vivora — video &amp; music player</title>
+<meta name="description" content="Vivora plays your videos and music with folders, subtitles, audio tracks, an equalizer, mini player and free music in 25 languages. Powered by Bubbles.">
+<meta name="theme-color" content="#0b0e1f">
+<link rel="icon" href="../img/vivora.svg">
+<link rel="apple-touch-icon" href="../img/vivora-180.png">
+<link rel="manifest" href="manifest.webmanifest">
+<link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="app.css?v=ad79552">
+</head>
+<body>
+<header class="top">
+  <a class="brand" href="../"><img src="../img/vivora.svg" alt=""><b>Vivora</b></a>
+  <nav class="tabs" id="tabs"><button data-tab="videos" class="on">Videos</button><button data-tab="music">Music</button></nav>
+  <div class="grow"></div>
+  <input id="search" class="search" placeholder="Search" aria-label="Search">
+  <button class="ib" id="addBtn" title="Add files or a folder"><svg viewBox="0 0 24 24"><path d="M12 5v14M5 12h14"/></svg></button>
+</header>
+
+<main id="lib" class="lib">
+  <aside class="side" id="side"></aside>
+  <section class="grid-wrap"><div class="crumbs" id="crumbs"></div><div class="grid" id="grid"></div><div class="empty hidden" id="empty"></div></section>
+</main>
+
+<!-- player -->
+<section class="player hidden" id="player" tabindex="-1">
+  <div class="stage" id="stage">
+    <video id="video" playsinline preload="metadata"></video>
+    <canvas id="viz" class="viz hidden"></canvas>
+    <div class="art hidden" id="art"><img id="artImg" alt=""><div><b id="artTitle"></b><span id="artSub"></span></div></div>
+    <div class="subs" id="subs"></div>
+    <div class="osd" id="osd"></div>
+    <div class="gest-l" id="gestL"></div><div class="gest-r" id="gestR"></div>
+  </div>
+  <div class="pbar-top"><button class="ib" id="backBtn" title="Back to library"><svg viewBox="0 0 24 24"><path d="M15 6l-6 6 6 6"/></svg></button><b id="ptitle"></b><div class="grow"></div>
+    <button class="ib" id="infoBtn" title="Info"><svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="9"/><path d="M12 11v6M12 8h.01"/></svg></button></div>
+  <div class="ctrls" id="ctrls">
+    <div class="seek" id="seek"><div class="buf" id="buf"></div><div class="fill" id="fill"></div><div class="ab" id="abMark"></div><div class="knob" id="knob"></div>
+      <div class="prev hidden" id="prev"><canvas id="prevCv" width="160" height="90"></canvas><span id="prevT"></span></div></div>
+    <div class="row">
+      <span class="time" id="time">0:00 / 0:00</span>
+      <div class="grow"></div>
+      <button class="ib" id="prevBtn" title="Previous (P)"><svg viewBox="0 0 24 24"><path d="M6 5v14M19 5l-10 7 10 7z"/></svg></button>
+      <button class="ib" id="rewBtn" title="Back 10s (←)"><svg viewBox="0 0 24 24"><path d="M11 17l-5-5 5-5M18 17l-5-5 5-5"/></svg></button>
+      <button class="play" id="playBtn" title="Play/Pause (Space)"><svg viewBox="0 0 24 24" id="playIco"><path d="M8 5l11 7-11 7z"/></svg></button>
+      <button class="ib" id="fwdBtn" title="Forward 10s (→)"><svg viewBox="0 0 24 24"><path d="M13 17l5-5-5-5M6 17l5-5-5-5"/></svg></button>
+      <button class="ib" id="nextBtn" title="Next (N)"><svg viewBox="0 0 24 24"><path d="M18 5v14M5 5l10 7-10 7z"/></svg></button>
+      <div class="grow"></div>
+      <div class="vol"><button class="ib" id="muteBtn" title="Mute (M)"><svg viewBox="0 0 24 24"><path d="M4 9h4l5-4v14l-5-4H4z"/><path d="M16 9a4 4 0 0 1 0 6M18.5 6.5a8 8 0 0 1 0 11"/></svg></button><input type="range" id="volR" min="0" max="2" step="0.02" value="1" title="Volume (up to 200%)"></div>
+      <button class="chip" id="speedBtn" title="Speed ([ and ])">1×</button>
+      <button class="ib" id="subBtn" title="Subtitles (C)"><svg viewBox="0 0 24 24"><rect x="3" y="5" width="18" height="14" rx="2"/><path d="M7 12h3M12 12h5M7 15h7"/></svg></button>
+      <button class="ib" id="audBtn" title="Audio track & sound (E)"><svg viewBox="0 0 24 24"><path d="M4 6v12M9 9v6M14 4v16M19 8v8"/></svg></button>
+      <button class="ib" id="moreBtn" title="More"><svg viewBox="0 0 24 24"><circle cx="5" cy="12" r="1.6"/><circle cx="12" cy="12" r="1.6"/><circle cx="19" cy="12" r="1.6"/></svg></button>
+      <button class="ib" id="pipBtn" title="Picture in picture"><svg viewBox="0 0 24 24"><rect x="3" y="5" width="18" height="14" rx="2"/><rect x="12" y="11" width="7" height="6" rx="1"/></svg></button>
+      <button class="ib" id="miniBtn" title="Mini player"><svg viewBox="0 0 24 24"><path d="M4 14l6-6M4 9V14h5"/><rect x="12" y="12" width="9" height="8" rx="1.5"/></svg></button>
+      <button class="ib" id="fsBtn" title="Full screen (F)"><svg viewBox="0 0 24 24"><path d="M4 9V4h5M20 9V4h-5M4 15v5h5M20 15v5h-5"/></svg></button>
+    </div>
+  </div>
+  <div class="panel hidden" id="panel"></div>
+</section>
+
+<!-- mini player -->
+<div class="mini hidden" id="mini"><div class="mini-v" id="miniSlot"></div><div class="mini-c"><b id="miniT"></b><div><button class="ib sm" id="miniPlay"><svg viewBox="0 0 24 24"><path d="M8 5l11 7-11 7z"/></svg></button><button class="ib sm" id="miniOpen" title="Open"><svg viewBox="0 0 24 24"><path d="M4 9V4h5M20 15v5h-5M4 4l6 6M20 20l-6-6"/></svg></button><button class="ib sm" id="miniClose" title="Close"><svg viewBox="0 0 24 24"><path d="M6 6l12 12M18 6L6 18"/></svg></button></div></div></div>
+
+<div class="sheet hidden" id="sheet"><div class="sheet-in" id="sheetIn"></div></div>
+<div class="toast" id="toast"></div>
+<input type="file" id="fileIn" multiple accept="video/*,audio/*,.mkv,.avi,.mov,.flac,.m4a,.opus,.ogg,.wav,.srt,.vtt" hidden>
+<input type="file" id="dirIn" webkitdirectory multiple hidden>
+<input type="file" id="subIn" accept=".srt,.vtt,.ass,.ssa" hidden>
+<footer class="pby-row"><a class="pby" href="../../" title="Bubbles Aro — more apps"><img src="../img/bubbles.svg" alt=""><span><small>Powered by</small><b>Bubbles</b></span></a><span class="muted small">by Abhiram Upadrashta · MIT</span></footer>
+<script type="module" src="app.js?v=ad79552"></script>
+</body>
+</html>
