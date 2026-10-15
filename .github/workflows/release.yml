@@ -1,0 +1,52 @@
+# Vivora's code is private (AbhiramUpadrashta/Vivora-src). This public repo builds the desktop apps and publishes them.
+name: Build & Release Vivora
+on:
+  push: { branches: [main], paths: ["release.txt"] }
+  workflow_dispatch: {}
+permissions: { contents: write }
+concurrency: { group: release, cancel-in-progress: false }
+jobs:
+  check:
+    runs-on: ubuntu-latest
+    outputs: { version: "${{ steps.v.outputs.version }}" }
+    steps:
+      - uses: actions/checkout@v4
+        with: { repository: AbhiramUpadrashta/Vivora-src, ssh-key: "${{ secrets.SRC_KEY }}" }
+      - id: v
+        run: echo "version=$(node -p "require('./desktop/package.json').version")" >> "$GITHUB_OUTPUT"
+  desktop:
+    needs: check
+    strategy: { fail-fast: false, matrix: { include: [ { os: macos-latest, target: mac }, { os: windows-latest, target: win } ] } }
+    runs-on: ${{ matrix.os }}
+    env: { CSC_IDENTITY_AUTO_DISCOVERY: "false" }
+    defaults: { run: { shell: bash } }
+    steps:
+      - uses: actions/checkout@v4
+        with: { repository: AbhiramUpadrashta/Vivora-src, ssh-key: "${{ secrets.SRC_KEY }}" }
+      - uses: actions/setup-node@v4
+        with: { node-version: 20 }
+      - name: Build
+        run: |
+          ./build.sh && cp -R dist desktop/app
+          cd desktop && npm install --no-audit --no-fund
+          if [ "${{ matrix.target }}" = mac ]; then
+            npm run dist:mac; APP="$(find dist -maxdepth 3 -name 'Vivora.app' | head -1)"; codesign --force --deep --sign - "$APP"
+            ditto -c -k --sequesterRsrc --keepParent "$APP" ../Vivora-mac.zip
+          else npm run dist:win; cp dist/Vivora-Setup.exe ../Vivora-Setup.exe; fi
+      - uses: actions/upload-artifact@v4
+        with: { name: "desktop-${{ matrix.target }}", path: "Vivora-*", if-no-files-found: error }
+  release:
+    needs: [check, desktop]
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/download-artifact@v4
+        with: { path: out, merge-multiple: true }
+      - env: { GH_TOKEN: "${{ github.token }}", GH_REPO: "${{ github.repository }}" }
+        run: |
+          V=${{ needs.check.outputs.version }}; TAG="v$V"; FILES="out/Vivora-mac.zip out/Vivora-Setup.exe"
+          NOTES="Vivora $V — video & music player by Abhiram Upadrashta. Powered by Bubbles. MIT License.
+
+          **Windows:** download Vivora-Setup.exe and run it (More info → Run anyway the first time).
+          **Mac (Apple silicon):** download Vivora-mac.zip, open it, drag Vivora to Applications, then right-click → Open the first time.
+          **Phones & web:** https://abhiramupadrashta.github.io/Vivora/app/"
+          if gh release view "$TAG" >/dev/null 2>&1; then gh release upload "$TAG" $FILES --clobber; else gh release create "$TAG" $FILES --title "Vivora $V" --notes "$NOTES" --latest; fi
