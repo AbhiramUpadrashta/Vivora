@@ -35,18 +35,39 @@ jobs:
           else npm run dist:win; cp dist/Vivora-Setup.exe ../Vivora-Setup.exe; fi
       - uses: actions/upload-artifact@v4
         with: { name: "desktop-${{ matrix.target }}", path: "Vivora-*", if-no-files-found: error }
+  android:
+    needs: check
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with: { repository: AbhiramUpadrashta/Vivora-src, ssh-key: "${{ secrets.SRC_KEY }}" }
+      - uses: actions/setup-node@v4
+        with: { node-version: 20 }
+      - uses: actions/setup-java@v4
+        with: { distribution: temurin, java-version: 17 }
+      - uses: gradle/actions/setup-gradle@v4
+        with: { gradle-version: "8.7" }
+      - name: Build APK
+        env: { VIVORA_VERSION: "${{ needs.check.outputs.version }}", VIVORA_VERSION_CODE: "${{ github.run_number }}" }
+        run: |
+          ./build.sh && mkdir -p android/app/src/main/assets && cp -R dist android/app/src/main/assets/www
+          gradle -p android assembleRelease --no-daemon
+          cp android/app/build/outputs/apk/release/app-release.apk Vivora.apk
+      - uses: actions/upload-artifact@v4
+        with: { name: android, path: Vivora.apk, if-no-files-found: error }
   release:
-    needs: [check, desktop]
+    needs: [check, desktop, android]
     runs-on: ubuntu-latest
     steps:
       - uses: actions/download-artifact@v4
         with: { path: out, merge-multiple: true }
       - env: { GH_TOKEN: "${{ github.token }}", GH_REPO: "${{ github.repository }}" }
         run: |
-          V=${{ needs.check.outputs.version }}; TAG="v$V"; FILES="out/Vivora-mac.zip out/Vivora-Setup.exe"
+          V=${{ needs.check.outputs.version }}; TAG="v$V"; FILES="out/Vivora-mac.zip out/Vivora-Setup.exe out/Vivora.apk"
           NOTES="Vivora $V — video & music player by Abhiram Upadrashta. Powered by Bubbles. MIT License.
 
           **Windows:** download Vivora-Setup.exe and run it (More info → Run anyway the first time).
           **Mac (Apple silicon):** download Vivora-mac.zip, open it, drag Vivora to Applications, then right-click → Open the first time.
-          **Phones & web:** https://abhiramupadrashta.github.io/Vivora/app/"
+          **Android:** download Vivora.apk on your phone, open it and tap Install.
+          **iPhone & web:** https://abhiramupadrashta.github.io/Vivora/app/"
           if gh release view "$TAG" >/dev/null 2>&1; then gh release upload "$TAG" $FILES --clobber; else gh release create "$TAG" $FILES --title "Vivora $V" --notes "$NOTES" --latest; fi
