@@ -11,7 +11,7 @@
 <link rel="manifest" href="manifest.webmanifest">
 <link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
-<link rel="stylesheet" href="app.css?v=c511898">
+<link rel="stylesheet" href="app.css?v=5b68245">
 </head>
 <body>
 <header class="top">
@@ -19,6 +19,8 @@
   <nav class="tabs" id="tabs"><button data-tab="videos" class="on">Videos</button><button data-tab="music">Music</button></nav>
   <div class="grow"></div>
   <input id="search" class="search" placeholder="Search" aria-label="Search">
+  <button class="ib hidden" id="installBtn" title="Install Vivora on this device"><svg viewBox="0 0 24 24"><path d="M12 4v11M7 10l5 5 5-5M5 20h14"/></svg></button>
+  <button class="ib hidden" id="updBtn" title="Check for updates"><svg viewBox="0 0 24 24"><path d="M20 12a8 8 0 1 1-2.3-5.6M20 4v5h-5"/></svg></button>
   <button class="ib" id="addBtn" title="Add files or a folder"><svg viewBox="0 0 24 24"><path d="M12 5v14M5 12h14"/></svg></button>
 </header>
 
@@ -73,6 +75,7 @@
 <input type="file" id="dirIn" webkitdirectory multiple hidden>
 <input type="file" id="subIn" accept=".srt,.vtt,.ass,.ssa" hidden>
 <footer class="pby-row"><a class="pby" href="../../" title="Bubbles Aro — more apps"><img src="../img/bubbles.svg" alt=""><span><small>Powered by</small><b>Bubbles</b></span></a><span class="muted small">by Abhiram Upadrashta · MIT</span></footer>
-<script type="module" src="app.js?v=c511898"></script>
+<script type="module" src="app.js?v=5b68245"></script>
+<div id="upd" class="upd hidden"><img src="../img/vivora.svg" alt=""><div><b id="updT"></b><small id="updS"></small></div><a id="updGo" class="updgo" target="_blank" rel="noopener">Update</a><button id="updX" class="updx" title="Later">✕</button></div>
 </body>
 </html>
