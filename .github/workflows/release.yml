@@ -69,5 +69,5 @@ jobs:
           **Windows:** download Vivora-Setup.exe and run it (More info → Run anyway the first time).
           **Mac (Apple silicon):** download Vivora-mac.zip, open it, drag Vivora to Applications, then right-click → Open the first time.
           **Android:** download Vivora.apk on your phone, open it and tap Install.
-          **iPhone & web:** https://abhiramupadrashta.github.io/Vivora/app/"
+          **iPhone & web:** https://bubbles.foo.ng/Vivora/app/"
           if gh release view "$TAG" >/dev/null 2>&1; then gh release upload "$TAG" $FILES --clobber; else gh release create "$TAG" $FILES --title "Vivora $V" --notes "$NOTES" --latest; fi

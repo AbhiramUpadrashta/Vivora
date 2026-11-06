@@ -2,7 +2,7 @@
 
 Video & music player — **created by Abhiram Upadrashta**, powered by Bubbles (Bubbles Aro). MIT License.
 
-**Website:** https://abhiramupadrashta.github.io/Vivora/ · **Web player:** https://abhiramupadrashta.github.io/Vivora/app/
+**Website:** https://bubbles.foo.ng/Vivora/ · **Web player:** https://bubbles.foo.ng/Vivora/app/
 **Download:** [latest release](https://github.com/AbhiramUpadrashta/Vivora/releases/latest) — Windows (Vivora-Setup.exe), Mac Apple silicon (Vivora-mac.zip)
 
 Folders (on-disk and your own), almost every format (desktop converts AVI/WMV/FLV/AC3/DTS with FFmpeg), subtitles (.srt/.vtt/.ass and embedded),
